@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load custom_filters %}  <!-- Chargement des filtres personnalisés -->
+
+{% block title %}{{ influencer.name }} - InfluenceHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card">
+                {% if influencer.profile_image %}
+                <img src="{{ influencer.profile_image.url }}" class="card-img-top"
+                     style="height: 300px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                     style="height: 300px;">
+                    <i class="fas fa-user-circle fa-5x text-muted"></i>
+                </div>
+                {% endif %}
+
+                <div class="card-body text-center">
+                    <h3>{{ influencer.name }}</h3>
+                    {% if influencer.full_name != influencer.name %}
+                    <p class="text-muted">{{ influencer.full_name }}</p>
+                    {% endif %}
+
+                    {% if influencer.category %}
+                    <span class="badge fs-6 mb-3"
+                          style="background-color:{{ influencer.category.color }};">
+                            {{ influencer.category.name }}
+                        </span>
+                    {% endif %}
+
+                    {% if influencer.location %}
+                    <p class="text-muted">
+                        <i class="fas fa-map-marker-alt"></i> {{ influencer.location }}
+                    </p>
+                    {% endif %}
+
+                    {% if influencer.status %}
+                    <span class="badge fs-6"
+                          style="background-color: {{ influencer.status.color }};">
+                            <i class="fas fa-check-circle"></i> {{ influencer.status.get_name_display }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-info-circle"></i> Informations</h4>
+                </div>
+                <div class="card-body">
+                    {% if influencer.bio %}
+                    <h6>Biographie</h6>
+                    <p>{{ influencer.bio|linebreaks }}</p>
+                    {% endif %}
+
+                    {% if influencer.niche_keywords %}
+                    <h6>Domaines d'expertise</h6>
+                    <p>
+                        {% for keyword in influencer.niche_keywords|split:"," %}
+                        <span class="badge bg-secondary me-1">{{ keyword.strip }}</span>
+                        {% endfor %}
+                    </p>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Contact</h6>
+                            <p><i class="fas fa-envelope"></i> {{ influencer.email }}</p>
+                            {% if influencer.phone %}
+                            <p><i class="fas fa-phone"></i> {{ influencer.phone }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Inscription</h6>
+                            <p><i class="fas fa-calendar"></i> {{ influencer.created_at|date:"d/m/Y" }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            {% if influencer.engagement_rate %}
+                            <h6>Engagement moyen</h6>
+                            <p><i class="fas fa-chart-line"></i> {{ influencer.engagement_rate }}%</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media Accounts -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4><i class="fas fa-share-alt"></i> Réseaux Sociaux</h4>
+                </div>
+                <div class="card-body">
+                    {% if influencer.social_accounts.all %}
+                    <div class="row g-3">
+                        {% for account in influencer.social_accounts.all %}
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="social-icon social-{{ account.platform.name|lower }} me-2">
+                                        <i class="{{ account.platform.icon }}"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ account.platform.get_name_display }}</h6>
+                                        <small class="text-muted">@{{ account.username }}</small>
+                                        {% if account.is_verified %}
+                                        <i class="fas fa-check-circle text-primary ms-1" title="Compte vérifié"></i>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <strong>{{ account.followers_count|floatformat:0 }}</strong>
+                                        <br><small class="text-muted">Abonnés</small>
+                                    </div>
+                                    <div class="col-4">
+                                        <strong>{{ account.posts_count|default:"N/A" }}</strong>
+                                        <br><small class="text-muted">Posts</small>
+                                    </div>
+                                    <div class="col-4">
+                                        <strong>{{ account.engagement_rate|default:"N/A" }}%</strong>
+                                        <br><small class="text-muted">Engagement</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Summary Stats -->
+                    <div class="mt-4">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <h4>{{ influencer.get_total_reach|floatformat:0 }}</h4>
+                                    <p class="mb-0">Portée totale</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <h4>{{ influencer.calculate_engagement }}%</h4>
+                                    <p class="mb-0">Engagement moyen</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <h4>{{ influencer.social_accounts.count }}</h4>
+                                    <p class="mb-0">Plateformes actives</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <h4>{{ influencer.verified_accounts_count }}</h4>
+
+                                    <p class="mb-0">Comptes vérifiés</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3">
+                        <i class="fas fa-info-circle"></i> Aucun compte de réseau social configuré
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center mt-4">
+        <a href="{% url 'influencer:list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Retour à la liste
+        </a>
+        {% if user.is_authenticated %}
+        <a href="#" class="btn btn-success">
+            <i class="fas fa-handshake"></i> Contacter
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

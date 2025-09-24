@@ -1,0 +1,50 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Inscription réussie - InfluenceHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+            <div class="card shadow">
+                <div class="card-body py-5">
+                    <div class="text-success mb-4">
+                        <i class="fas fa-check-circle fa-5x"></i>
+                    </div>
+                    
+                    <h2 class="text-success mb-3">Inscription réussie !</h2>
+                    
+                    <p class="lead mb-4">
+                        Merci de votre intérêt pour InfluenceHub ! 
+                        Votre candidature a été soumise avec succès.
+                    </p>
+                    
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle"></i> Prochaines étapes :</h6>
+                        <ul class="list-unstyled mb-0 text-start">
+                            <li><i class="fas fa-check text-success"></i> Vérification de votre profil</li>
+                            <li><i class="fas fa-clock text-warning"></i> Validation de vos comptes sociaux</li>
+                            <li><i class="fas fa-envelope text-primary"></i> Notification par email</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="text-muted">
+                        Notre équipe examinera votre profil dans les 24-48h. 
+                        Vous recevrez un email de confirmation une fois votre compte activé.
+                    </p>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'home' %}" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Retour à l'accueil
+                        </a>
+                        <a href="{% url 'influencer:list' %}" class="btn btn-outline-primary ms-2">
+                            <i class="fas fa-users"></i> Voir les influenceurs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
