@@ -71,7 +71,7 @@ class Influencer(models.Model):
 
     # Informations professionnelles
     profile_image = models.ImageField(upload_to='influencers/profiles/', blank=True)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, verbose_name="Catégorie")
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, verbose_name="Catégorie",related_name='influencers')
     niche_keywords = models.TextField(blank=True, help_text="Mots-clés séparés par des virgules")
     engagement_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     location = models.CharField(max_length=100, blank=True, verbose_name="Localisation")
@@ -122,7 +122,7 @@ class SocialMediaAccount(models.Model):
         null=True,
         blank=True
     )
-    posts_count = models.PositiveIntegerField(verbose_name="Nombre de publications")
+    posts_count = models.PositiveIntegerField(verbose_name="Nombre de publications",default=0)
     engagement_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     is_verified = models.BooleanField(default=False, verbose_name="Compte vérifié")
     created_at = models.DateTimeField(auto_now_add=True)

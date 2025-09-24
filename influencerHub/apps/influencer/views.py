@@ -53,6 +53,14 @@ class InfluencerDetailView(DetailView):
     context_object_name = 'influencer'
 
 
+from django.shortcuts import redirect
+from django.views.generic import CreateView, TemplateView
+from django.contrib.messages.views import SuccessMessageMixin
+from django.urls import reverse_lazy
+from .models import Influencer
+from .forms import InfluencerRegistrationForm, SocialMediaAccountFormSet
+
+
 class InfluencerRegistrationView(SuccessMessageMixin, CreateView):
     model = Influencer
     form_class = InfluencerRegistrationForm
@@ -63,7 +71,7 @@ class InfluencerRegistrationView(SuccessMessageMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
-            context['social_formset'] = SocialMediaAccountFormSet(self.request.POST)
+            context['social_formset'] = SocialMediaAccountFormSet(self.request.POST, self.request.FILES)
         else:
             context['social_formset'] = SocialMediaAccountFormSet()
         return context
@@ -72,20 +80,26 @@ class InfluencerRegistrationView(SuccessMessageMixin, CreateView):
         context = self.get_context_data()
         social_formset = context['social_formset']
 
-        for form in social_formset:
-            if form.is_valid() and form.has_changed():
-                if not form.cleaned_data.get('following_count'):
-                    form.instance.following_count = 0
+        # On sauvegarde d'abord l'influenceur pour obtenir l'ID
+        self.object = form.save()
 
         if social_formset.is_valid():
-            self.object = form.save()
-            social_formset.instance = self.object
-            social_formset.save()
+            # Sauvegarde chaque compte social avec l'influenceur lié
+            social_accounts = social_formset.save(commit=False)
+            for account in social_accounts:
+                account.influencer = self.object
+                if not account.following_count:
+                    account.following_count = 0
+                account.save()
+
+            # Supprime les comptes marqués pour suppression
+            for obj in social_formset.deleted_objects:
+                obj.delete()
+
             return super().form_valid(form)
         else:
+            # Si formset invalide, on réaffiche le formulaire avec erreurs
             return self.render_to_response(self.get_context_data(form=form))
-
-
 class InfluencerUpdateView(SuccessMessageMixin, UpdateView):
     model = Influencer
     form_class = InfluencerRegistrationForm

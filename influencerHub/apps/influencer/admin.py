@@ -42,18 +42,18 @@ class CategoryAdmin(admin.ModelAdmin):
             '<div style="width: 20px; height: 20px; background-color: {}; border-radius: 3px;"></div>',
             obj.color
         )
-
     color_preview.short_description = 'Couleur'
 
     def influencer_count(self, obj):
-        return obj.influencers.count()
-
+        return obj.influencer_count
     influencer_count.short_description = 'Nb. influenceurs'
 
     def get_queryset(self, request):
+        # ✅ Indentation correcte
         return super().get_queryset(request).annotate(
-            influencer_count=Count('influencer')
+            influencer_count=Count('influencers')  # related_name de ForeignKey
         )
+
 
 
 @admin.register(Influencer)
